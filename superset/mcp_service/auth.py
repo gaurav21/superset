@@ -51,6 +51,10 @@ from typing import Any, Callable, TYPE_CHECKING, TypeVar
 from flask import current_app, g, has_app_context, has_request_context
 from flask_appbuilder.security.sqla.models import Group, User
 
+from superset.mcp_service.utils.error_sanitization import (
+    sanitize_for_log as _sanitize_for_log,
+)
+
 if TYPE_CHECKING:
     from superset.connectors.sqla.models import SqlaTable
     from superset.mcp_service.chart.chart_utils import DatasetValidationResult
@@ -75,21 +79,6 @@ class MCPNoAuthSourceError(ValueError):
     credential failure (fail closed) can ``isinstance``-check instead of
     matching a fragile message string.
     """
-
-
-def _sanitize_iss_for_log(value: Any) -> str:
-    """Escape control characters in an issuer claim before logging.
-
-    The ``iss`` claim is attacker-controlled and may contain newlines that
-    could forge or split log lines; collapse them to keep one log entry.
-    """
-    return (
-        str(value)
-        .replace("\\", "\\\\")
-        .replace("\n", "\\n")
-        .replace("\r", "\\r")
-        .replace("\t", "\\t")
-    )
 
 
 # Maps a tool's method permission to the OAuth-style token scope it requires.
@@ -439,7 +428,7 @@ def _resolve_user_from_jwt_context(app: Any) -> User | None:
                 "issuers minting the same username/email will collide. Configure an "
                 "issuer-aware MCP_USER_RESOLVER to derive a compound (iss+sub) "
                 "identity.",
-                _sanitize_iss_for_log(token_iss),
+                _sanitize_for_log(token_iss),
             )
 
     # Use configurable resolver or default
