@@ -68,6 +68,8 @@ bcrypt==4.3.0
     # via
     #   -c requirements/base-constraint.txt
     #   paramiko
+invoke==3.0.3
+    # via paramiko
 beartype==0.22.5
     # via py-key-value-aio
 billiard==4.2.1
@@ -643,7 +645,7 @@ pandas-gbq==0.19.1
     # via apache-superset
 parameterized==0.9.0
     # via apache-superset
-paramiko==3.5.1
+paramiko==5.0.0
     # via
     #   -c requirements/base-constraint.txt
     #   apache-superset
