@@ -60,8 +60,6 @@ class TestAsyncQueries(SupersetTestCase):
     ):
         from superset.tasks.async_queries import load_chart_data_into_cache
 
-        app._got_first_request = False
-
         async_query_manager.get_cache_backend = mock.Mock(return_value=cache_backend)
         async_query_manager.init_app(app)
 
@@ -97,8 +95,6 @@ class TestAsyncQueries(SupersetTestCase):
     ):
         from superset.tasks.async_queries import load_chart_data_into_cache
 
-        app._got_first_request = False
-
         async_query_manager.get_cache_backend = mock.Mock(return_value=cache_backend)
         async_query_manager.init_app(app)
 
@@ -130,8 +126,6 @@ class TestAsyncQueries(SupersetTestCase):
         self, cache_type, cache_backend, mock_update_job, mock_run_command
     ):
         from superset.tasks.async_queries import load_chart_data_into_cache
-
-        app._got_first_request = False
 
         async_query_manager.get_cache_backend = mock.Mock(return_value=cache_backend)
         async_query_manager.init_app(app)
@@ -168,8 +162,6 @@ class TestAsyncQueries(SupersetTestCase):
         self, cache_type, cache_backend, mock_update_job
     ):
         from superset.tasks.async_queries import load_explore_json_into_cache
-
-        app._got_first_request = False
 
         async_query_manager.get_cache_backend = mock.Mock(return_value=cache_backend)
         async_query_manager.init_app(app)
@@ -213,8 +205,6 @@ class TestAsyncQueries(SupersetTestCase):
     ):
         from superset.tasks.async_queries import load_explore_json_into_cache
 
-        app._got_first_request = False
-
         async_query_manager.get_cache_backend = mock.Mock(return_value=cache_backend)
         async_query_manager.init_app(app)
 
@@ -247,8 +237,6 @@ class TestAsyncQueries(SupersetTestCase):
         self, cache_type, cache_backend, mock_update_job, mock_run_command
     ):
         from superset.tasks.async_queries import load_explore_json_into_cache
-
-        app._got_first_request = False
 
         async_query_manager.get_cache_backend = mock.Mock(return_value=cache_backend)
         async_query_manager.init_app(app)
