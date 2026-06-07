@@ -19,9 +19,27 @@ import logging
 from io import StringIO
 from typing import TYPE_CHECKING
 
+import paramiko
 import sshtunnel
 from flask import Flask
 from paramiko import RSAKey
+
+# Compatibility shim: paramiko >=4.0 removed DSA (DSSKey) support, but
+# sshtunnel 0.4.0 still references paramiko.DSSKey in its get_keys() helper.
+# Provide a no-op stub so sshtunnel can build its key-type dict without
+# raising AttributeError.  No real DSA key will ever be loaded.
+if not hasattr(paramiko, "DSSKey"):
+
+    class _DSSKeyStub:  # noqa: E303
+        """Stub for removed paramiko.DSSKey; prevents AttributeError in sshtunnel."""
+
+        @staticmethod
+        def from_private_key_file(*args: object, **kwargs: object) -> None:
+            raise paramiko.SSHException(
+                "DSA keys are no longer supported (paramiko >= 4.0)"
+            )
+
+    paramiko.DSSKey = _DSSKeyStub  # type: ignore[attr-defined]
 
 from superset.commands.database.ssh_tunnel.exceptions import SSHTunnelDatabasePortError
 from superset.databases.utils import make_url_safe
