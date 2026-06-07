@@ -742,7 +742,7 @@ class TestPostChartDataApi(BaseTestChartDataApi):
     @pytest.mark.usefixtures("load_birth_names_dashboard_with_slices")
     def test_chart_data_async(self):
         self.logout()
-        app._got_first_request = False
+
         async_query_manager_factory.init_app(app)
         self.login(ADMIN_USERNAME)
         # Introducing time.sleep to make test less flaky with MySQL
@@ -765,7 +765,7 @@ class TestPostChartDataApi(BaseTestChartDataApi):
         Chart data API: Test chart data query returns results synchronously
         when results are already cached, and that is_cached is logged.
         """
-        app._got_first_request = False
+
         async_query_manager_factory.init_app(app)
 
         class QueryContext:
@@ -839,7 +839,7 @@ class TestPostChartDataApi(BaseTestChartDataApi):
         """
         Chart data API: Test that force=true skips cache and triggers async job
         """
-        app._got_first_request = False
+
         async_query_manager_factory.init_app(app)
 
         # Mock the command.run to return cached data
@@ -880,7 +880,7 @@ class TestPostChartDataApi(BaseTestChartDataApi):
         """
         Chart data API: Test chart data query non-JSON format (async)
         """
-        app._got_first_request = False
+
         async_query_manager_factory.init_app(app)
         self.query_context_payload["result_type"] = "results"
         rv = self.post_assert_metric(CHART_DATA_URI, self.query_context_payload, "data")
@@ -892,7 +892,7 @@ class TestPostChartDataApi(BaseTestChartDataApi):
         """
         Chart data API: Test chart data query (async)
         """
-        app._got_first_request = False
+
         async_query_manager_factory.init_app(app)
         test_client.set_cookie(
             app.config["GLOBAL_ASYNC_QUERIES_JWT_COOKIE_NAME"], "foo"
@@ -1406,7 +1406,7 @@ class TestGetChartDataApi(BaseTestChartDataApi):
         """
         Chart data cache API: Test chart data async cache request
         """
-        app._got_first_request = False
+
         async_query_manager_factory.init_app(app)
         cache_loader.load.return_value = self.query_context_payload
         orig_run = ChartDataCommand.run
@@ -1433,7 +1433,7 @@ class TestGetChartDataApi(BaseTestChartDataApi):
         """
         Chart data cache API: Test chart data async cache request with run failure
         """
-        app._got_first_request = False
+
         async_query_manager_factory.init_app(app)
         cache_loader.load.return_value = self.query_context_payload
         rv = self.get_assert_metric(
@@ -1454,7 +1454,6 @@ class TestGetChartDataApi(BaseTestChartDataApi):
         if get_example_database().backend == "presto":
             return
 
-        app._got_first_request = False
         async_query_manager_factory.init_app(app)
         self.logout()
         cache_loader.load.return_value = self.query_context_payload
@@ -1477,7 +1476,7 @@ class TestGetChartDataApi(BaseTestChartDataApi):
         """
         Chart data cache API: Test chart data async cache request with invalid cache key
         """
-        app._got_first_request = False
+
         async_query_manager_factory.init_app(app)
         rv = self.get_assert_metric(
             f"{CHART_DATA_URI}/test-cache-key", "data_from_cache"

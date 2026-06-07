@@ -37,7 +37,6 @@ class TestAsyncEventApi(SupersetTestCase):
         return self.client.get(uri)
 
     def run_test_with_cache_backend(self, cache_backend_cls: Type[Any], test_func):
-        app._got_first_request = False
         async_query_manager_factory.init_app(app)
 
         # Create a mock cache backend instance
@@ -126,7 +125,6 @@ class TestAsyncEventApi(SupersetTestCase):
         )
 
     def test_events_no_login(self):
-        app._got_first_request = False
         async_query_manager_factory.init_app(app)
         rv = self.fetch_events()
         assert rv.status_code == 401
