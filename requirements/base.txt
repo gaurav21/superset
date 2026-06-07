@@ -100,6 +100,8 @@ deprecation==2.1.0
     # via apache-superset (pyproject.toml)
 dnspython==2.7.0
     # via email-validator
+ecdsa==0.19.2
+    # via python-jose
 email-validator==2.2.0
     # via flask-appbuilder
 et-xmlfile==2.0.0
@@ -302,6 +304,7 @@ pyarrow==20.0.0
 pyasn1==0.6.3
     # via
     #   pyasn1-modules
+    #   python-jose
     #   rsa
 pyasn1-modules==0.4.2
     # via google-auth
@@ -344,6 +347,8 @@ python-dateutil==2.9.0.post0
     #   shillelagh
 python-dotenv==1.2.2
     # via apache-superset (pyproject.toml)
+python-jose==3.5.0
+    # via -r requirements/base.in
 pytz==2025.2
     # via
     #   croniter
@@ -379,7 +384,9 @@ rpds-py==0.25.0
     #   jsonschema
     #   referencing
 rsa==4.9.1
-    # via google-auth
+    # via
+    #   google-auth
+    #   python-jose
 selenium==4.32.0
     # via apache-superset (pyproject.toml)
 setuptools==80.9.0
@@ -390,6 +397,7 @@ simplejson==3.20.1
     # via apache-superset (pyproject.toml)
 six==1.17.0
     # via
+    #   ecdsa
     #   prison
     #   python-dateutil
     #   rfc3339-validator
