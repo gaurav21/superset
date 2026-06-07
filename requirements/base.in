@@ -35,6 +35,10 @@ pyarrow>=20.0.0,<21.0.0
 pyopenssl>=26.0.0,<27.0.0
 # Security: CVE-2026-25645 (MEDIUM) - Insecure Temporary File
 requests>=2.33.0,<3.0.0
+# Security: CVE-2024-33663 (HIGH) - Algorithm confusion in python-jose ECDSA verification
+# Superset does NOT use python-jose (it uses PyJWT + authlib.jose instead).
+# DO NOT add python-jose as a dependency; the library is unmaintained and
+# has no release that fixes CVE-2024-33663. Use PyJWT or authlib instead.
 
 # 5.0.0 has a sensitive deprecation used in other libs
 # -> https://github.com/aio-libs/async-timeout/blob/master/CHANGES.rst#500-2024-10-31
