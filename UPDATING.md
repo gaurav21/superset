@@ -24,6 +24,18 @@ assists people when migrating to a new version.
 
 ## Next
 
+### Flask upgraded from 2.x to 3.x
+
+The minimum Flask version has been raised from `>=2.2.5` to `>=3.1.0`. This is a major version upgrade with breaking changes:
+
+- **`flask.escape` and `flask.Markup`** have been removed. Use `markupsafe.escape` and `markupsafe.Markup` instead.
+- **`flask.helpers.locked_cached_property`** has been removed (use `werkzeug.utils.cached_property`).
+- **`flask._app_ctx_stack` and `flask._request_ctx_stack`** have been removed.
+- **Flask-SQLAlchemy** has been upgraded from 2.5.1 to 3.0.5. The top-level `BaseQuery` import is deprecated; use `sqlalchemy.orm.Query` or `flask_sqlalchemy.query.Query` instead.
+- **Flask-Babel** has been upgraded from 3.1.0 to 4.0.0.
+
+If you have custom Superset plugins or extensions that import `escape` or `Markup` from Flask, update them to import from `markupsafe`. If you use `flask_sqlalchemy.BaseQuery`, migrate to `sqlalchemy.orm.Query`.
+
 ### YDB now uses a native sqlglot dialect
 
 YDB SQL parsing now relies on the dedicated [`ydb-sqlglot-plugin`](https://pypi.org/project/ydb-sqlglot-plugin/) dialect, which registers itself with sqlglot automatically. YDB users must install this plugin (e.g., via `pip install "apache-superset[ydb]"`) to avoid a `ValueError` when Superset parses YDB queries.
