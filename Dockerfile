@@ -20,6 +20,12 @@
 ######################################################################
 ARG PY_VER=3.11.14-slim-trixie
 
+# Pin base-image digests for reproducible, supply-chain-safe builds.
+# To update: docker buildx imagetools inspect <image>:<tag>
+ARG PY_DIGEST=sha256:c8271b1f627d0068857dce5b53e14a9558603b527e46f1f901722f935b786a39
+ARG NODE_DIGEST=sha256:e637ac91fb4f2f40761d217c5d48c41a05edf0b65eb9c34e72c27cce55af9e65
+ARG UV_DIGEST=sha256:b46b03ddfcfbf8f547af7e9eaefdf8a39c8cebcba7c98858d3162bd28cf536f6
+
 # If BUILDPLATFORM is null, set it to 'amd64' (or leave as is otherwise).
 ARG BUILDPLATFORM=${BUILDPLATFORM:-amd64}
 
@@ -29,7 +35,7 @@ ARG BUILD_TRANSLATIONS="false"
 ######################################################################
 # superset-node-ci used as a base for building frontend assets and CI
 ######################################################################
-FROM --platform=${BUILDPLATFORM} node:22-trixie-slim AS superset-node-ci
+FROM --platform=${BUILDPLATFORM} node:22-trixie-slim@${NODE_DIGEST} AS superset-node-ci
 ARG BUILD_TRANSLATIONS
 ENV BUILD_TRANSLATIONS=${BUILD_TRANSLATIONS}
 ARG DEV_MODE="false"           # Skip frontend build in dev mode
@@ -98,9 +104,14 @@ RUN if [ "${BUILD_TRANSLATIONS}" = "true" ]; then \
 
 
 ######################################################################
+# Pinned uv binary (used via COPY --from)
+######################################################################
+FROM ghcr.io/astral-sh/uv@${UV_DIGEST} AS uv-bin
+
+######################################################################
 # Base python layer
 ######################################################################
-FROM python:${PY_VER} AS python-base
+FROM python:${PY_VER}@${PY_DIGEST} AS python-base
 
 ARG SUPERSET_HOME="/app/superset_home"
 ENV SUPERSET_HOME=${SUPERSET_HOME}
@@ -113,7 +124,7 @@ RUN useradd --user-group -d ${SUPERSET_HOME} -m --no-log-init --shell /bin/bash 
 # Some bash scripts needed throughout the layers
 COPY --chmod=755 docker/*.sh /app/docker/
 
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+COPY --from=uv-bin /uv /usr/local/bin/uv
 
 # Using uv as it's faster/simpler than pip
 RUN uv venv /app/.venv
@@ -187,7 +198,9 @@ COPY scripts/check-env.py scripts/
 # keeping for backward compatibility
 COPY --chmod=755 ./docker/entrypoints/run-server.sh /usr/bin/
 
-# Some debian libs
+# Install runtime libraries needed by compiled Python extensions (psycopg2,
+# python-ldap, etc.) plus dev headers required to compile them. The dev headers
+# are stripped in the final "lean" stage below.
 RUN /app/docker/apt-install.sh \
       curl \
       libsasl2-dev \
@@ -235,6 +248,24 @@ RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
 RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
     uv pip install -e .
 RUN python -m compileall /app/superset
+
+# Strip development headers that were only needed for compiling C extensions.
+# Mark the corresponding runtime shared libraries as manually installed so
+# apt autoremove keeps them.
+RUN apt-mark manual \
+      libsasl2-2 \
+      libsasl2-modules-gssapi-mit \
+      libpq5 \
+      libecpg6 \
+      libldap-2.5-0 \
+    && apt-get purge -yqq --allow-remove-essential \
+       libsasl2-dev \
+       libpq-dev \
+       libecpg-dev \
+       libldap2-dev \
+    && apt-get autoremove -yqq --purge \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 USER superset
 
