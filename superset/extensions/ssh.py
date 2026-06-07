@@ -35,7 +35,7 @@ if not hasattr(paramiko, "DSSKey"):
 
         @staticmethod
         def from_private_key_file(*args: object, **kwargs: object) -> None:
-            raise NotImplementedError(
+            raise paramiko.SSHException(
                 "DSA keys are no longer supported (paramiko >= 4.0)"
             )
 
