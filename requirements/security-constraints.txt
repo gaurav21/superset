@@ -1,0 +1,28 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+# Security constraints for packages that are NOT direct dependencies of Superset
+# but may appear as transitive dependencies. These constraints ensure that if a
+# vulnerable package is ever pulled in transitively, the resolved version is safe.
+#
+# For direct dependency security pins, see requirements/base.in instead.
+
+# CVE-2024-33663 (HIGH) - python-jose algorithm confusion with ECDSA keys.
+# Superset does NOT use python-jose (uses PyJWT + authlib instead), but this
+# constraint prevents a vulnerable version from being pulled in transitively.
+python-jose>=3.4.0
