@@ -30,6 +30,8 @@ backoff==2.2.1
     # via apache-superset (pyproject.toml)
 bcrypt==4.3.0
     # via paramiko
+invoke==3.0.3
+    # via paramiko
 billiard==4.2.1
     # via celery
 blinker==1.9.0
@@ -274,7 +276,7 @@ packaging==25.0
     #   shillelagh
 pandas==2.1.4
     # via apache-superset (pyproject.toml)
-paramiko==3.5.1
+paramiko==5.0.0
     # via
     #   apache-superset (pyproject.toml)
     #   sshtunnel
